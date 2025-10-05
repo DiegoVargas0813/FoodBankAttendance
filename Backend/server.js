@@ -16,13 +16,15 @@ app.get('/', (req, res) => {
 });
 
 // Archivos de rutas
-const testingRoute = require('./routes/testingroute')
+const loginRoute = require('./routes/loginRoute')
 const userRoute = require('./routes/userRoute')
+
 
 // Usar rutas
 app.use(cors({origin: 'http://localhost:5173'}));
-app.use('/testing', testingRoute);
-app.use('/users', userRoute);
+app.use(cors({origin: 'http://localhost:4173'}));
+app.use('/api/users', userRoute);
+app.use('/api/signup', loginRoute);
 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;

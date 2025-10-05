@@ -11,14 +11,3 @@ exports.fetchUserById = (id) => {
         });
     });
 }
-
-exports.fetchUserByEmail = (email) => {
-    return new Promise((resolve, reject) => {
-        db.query('SELECT * FROM users WHERE email = ?', [email], (err, rows) => {
-            if (err) {
-                return reject(err);
-            }
-            resolve(rows[0]); // Return the user object (or undefined if not found)
-        });
-    });
-}

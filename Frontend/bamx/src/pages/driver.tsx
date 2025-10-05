@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Dashboard = () => {
+const Driver = () => {
     // @ts-ignore
     const navigate = useNavigate();
     // @ts-ignore
@@ -11,10 +11,10 @@ const Dashboard = () => {
 
     return (
         <div>   
-            <h1>Dashboard</h1>
-            <p>Welcome to the dashboard!</p>
+            <h1>Driver</h1>
+            <p>Welcome to the Driver Dashboard!</p>
         </div>
     )
 }
 
-export default Dashboard;
+export default Driver;

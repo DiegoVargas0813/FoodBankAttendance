@@ -24,7 +24,7 @@ const Login = () => {
         setIsLoading(true);
 
         try{
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/users/login`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/signup/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -43,12 +43,30 @@ const Login = () => {
             if(data && data.jwt && data.user){
                 localStorage.setItem('token', data.jwt);
                 localStorage.setItem('user', JSON.stringify({
-                    email,
-                    name: data.name
+                    email: data.user.email,
+                    name: data.user.name,
+                    role: data.user.role,
+                    id: data.user.id
                 }));
 
+                
                 //TODO: Añadir aqui variantes de redireccion segun el rol del usuario
-                navigate('/dashboard');
+                switch(data.user.role){
+                    case 'admin':
+                        navigate('/admin');
+                        break;
+                    case 'user':
+                        navigate('/dashboard');
+                        break;
+                    case 'DRIVER':
+                        navigate('/driver');
+                        break;
+                    case 'family':
+                        navigate('/family');
+                        break;
+                    default:
+                        navigate('/dashboard');
+                }
 
             }else{
                 throw new Error('Respuesta inválida del servidor');
@@ -110,6 +128,13 @@ const Login = () => {
                             disabled={isLoading}
                         >
                             {isLoading ? 'Cargando...' : 'Iniciar Sesión'}
+                        </Button>
+                        <Button
+                            variant="link"
+                            className="w-full"
+                            onClick={() => navigate('/register')}
+                        >
+                            ¿No tienes una cuenta? Regístrate
                         </Button>
                     </CardFooter>
                 </form>
