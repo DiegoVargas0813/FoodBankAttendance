@@ -88,7 +88,7 @@
 7. **(Optional) Resetting the database:**
    ```sh
    docker-compose down
-   docker volume rm banco_de_alimentos_db_data
+   docker volume rm aplicacion_db_data
    docker-compose up --build
    ```
 
