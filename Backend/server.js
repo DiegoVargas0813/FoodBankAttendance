@@ -21,8 +21,15 @@ const userRoute = require('./routes/userRoute')
 
 
 // Usar rutas
-app.use(cors({origin: 'http://localhost:5173'}));
-app.use(cors({origin: 'http://localhost:4173'}));
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:4173',
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ],
+  credentials: true
+}));
 app.use('/api/users', userRoute);
 app.use('/api/signup', loginRoute);
 

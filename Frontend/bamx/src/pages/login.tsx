@@ -81,9 +81,9 @@ const Login = () => {
     //Return
     return (
         <div>
-            <Card className="w-full shadow-lg">
+            <Card className="w-full shadow-lg w-96 m-auto mt-20">
                 <CardHeader className="space-y-1">
-                    <CardTitle className="border p-4">Login</CardTitle>
+                    <CardTitle className="border p-4 text-primary">Login</CardTitle>
                     <CardDescription>Introduzca sus credenciales de acceso</CardDescription>
                 </CardHeader>
 

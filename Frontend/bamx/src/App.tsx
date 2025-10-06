@@ -4,7 +4,6 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 // @ts-ignore
 import viteLogo from '/vite.svg'
-import './App.css'
 // @ts-ignore
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 

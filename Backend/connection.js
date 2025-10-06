@@ -1,18 +1,20 @@
-const mysql = require('mysql')
+const mysql = require('mysql');
 
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'DiegoVargas_0813', //TODO: Put this later into an ENV 
-    database: 'bamx'
-})
-
-connection.connect((err) => {
-    if (err) {
-        console.error('Error connecting to the database:', err);
-        return;
-    }
-    console.log('Connected to the database');
+const pool = mysql.createPool({
+  connectionLimit: 10,
+  host: process.env.DB_HOST || 'mysql',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'bamx',
 });
 
-module.exports = connection;
+pool.getConnection((err, connection) => {
+  if (err) {
+    console.error('Error connecting to the database:', err);
+    return;
+  }
+  console.log('Connected to the database');
+  connection.release(); // release immediately — just testing the pool
+});
+
+module.exports = pool;
