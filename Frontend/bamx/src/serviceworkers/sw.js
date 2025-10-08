@@ -1,8 +1,17 @@
 // Use IndexedDB for persistent queue storage
 import {precacheAndRoute} from 'workbox-precaching';
+import { NavigationRoute, registerRoute } from 'workbox-routing';
+import { createHandlerBoundToURL } from 'workbox-precaching';
+
 precacheAndRoute(self.__WB_MANIFEST);
 const DB_NAME = 'bamx-pwa-db';
 const STORE_NAME = 'post-queue';
+
+registerRoute(
+  new NavigationRoute(
+    createHandlerBoundToURL('/index.html')
+  )
+);
 
 function openDB() {
   return new Promise((resolve, reject) => {

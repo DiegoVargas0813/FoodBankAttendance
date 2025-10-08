@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+// Import components
+import Sidebar from '../components/layout/sidebard';
+import Header from '../components/layout/header';
+
 const Dashboard = () => {
     // @ts-ignore
     const navigate = useNavigate();
@@ -11,8 +15,8 @@ const Dashboard = () => {
 
     return (
         <div>   
-            <h1>Dashboard</h1>
-            <p>Welcome to the dashboard!</p>
+            <Header/>
+            <Sidebar />
         </div>
     )
 }

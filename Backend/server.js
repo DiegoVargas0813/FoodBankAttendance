@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 // Archivos de rutas
 const loginRoute = require('./routes/loginRoute')
 const userRoute = require('./routes/userRoute')
+const confirmRoute = require('./routes/confirmRoute');
 
 
 // Usar rutas
@@ -30,8 +31,10 @@ app.use(cors({
   ],
   credentials: true
 }));
-app.use('/api/users', userRoute);
-app.use('/api/signup', loginRoute);
+app.use('/api/users', userRoute); //Rutas para usuarios (protegidas)
+app.use('/api/signup', loginRoute); //Rutas para login y registro (no protegidas)
+app.use('/api', confirmRoute); // Ruta para confirmación de email
+
 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;

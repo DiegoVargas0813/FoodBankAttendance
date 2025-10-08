@@ -28,6 +28,7 @@ exports.getUserByIdAdminOnly = async (req, res) => {
     }
 };
 
+// TODO: Remover una vez se hayan implementado todas las rutas protegidas y con control de rol
 // Ruta desprotegida
 // Esta ruta se accede por cualquier usuario, autenticado o no. Usada principalmente para login o registro.
 exports.getUserById = async (req, res) => {

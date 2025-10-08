@@ -1,4 +1,5 @@
 const loginModel = require('../models/loginModel');
+const { sendConfirmationEmail } = require('../utils/email');
 
 const bcrypt = require('bcrypt'); // For password hashing
 const jwt = require('jsonwebtoken'); // For JWT handling
@@ -43,8 +44,12 @@ exports.register = async (req, res) => {
     const {email,password, username,role} = req.body;
     try {
         const newUser = await loginModel.postNewUser({email,password, username,role});
+        
+        //Confirmation email
+        await sendConfirmationEmail(email, newUser.confirmationToken);
+
         res.status(201).json({ 
-            message: 'User registered successfully',
+            message: 'User registered successfully, check your email',
             user: newUser
         });
     } catch (error) {

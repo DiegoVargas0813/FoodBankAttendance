@@ -16,6 +16,7 @@ exports.fetchUserByEmail = (email) => {
 }
 
 //Note: check the code matching with DB schema
+//DOING: Adding email confirmation token logic
 exports.postNewUser = (user) => {
     return new Promise((resolve, reject) => {
         try{
@@ -43,14 +44,15 @@ exports.postNewUser = (user) => {
         
         const { email, password, username, role } = user;
         const hashedPassword = bcrypt.hashSync(password, 12); // Hash the password
+        const confirmationToken = require('crypto').randomBytes(32).toString('hex'); // Generate a random token
         
         console.log('Registering user:', { email, username, hashedPassword, role }); // Debug log
-
-        db.query('INSERT INTO users (email, password, username, role) VALUES (?, ?, ?, ?)', [email, hashedPassword, username, role], (err, result) => {
+        
+        db.query('INSERT INTO users (email, password, username, role, confirmation_token) VALUES (?, ?, ?, ?, ?)', [email, hashedPassword, username, role, confirmationToken], (err, result) => {
             if (err) {
                 return reject(err);
             }
-            resolve({ id: result.insertId, ...user }); // Return the newly created user with its ID
+            resolve({ id: result.insertId, ...user, confirmationToken }); // Return the newly created user with its ID
         });
     });
 }

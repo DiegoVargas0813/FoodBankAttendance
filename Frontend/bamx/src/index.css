@@ -41,7 +41,7 @@
     /* Oracle Blue for sidebar */
     --sidebar-background: 210 50% 23%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 358 75% 43%;
+    --sidebar-primary: 144 100% 29%;
     --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 210 30% 18%;
     --sidebar-accent-foreground: 0 0% 98%;
@@ -98,6 +98,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    background-color: hsl(var(--sidebar-background));
     padding-left: 0.75rem;
     padding-right: 0.75rem;
     padding-top: 0.5rem;

@@ -12,12 +12,17 @@ import {
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 
+// Import context
+import { useAuth } from '../context/AuthContext';
+
 const Login = () => {
     //Constants to handle login
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+
+    const {setUser} = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -48,6 +53,13 @@ const Login = () => {
                     role: data.user.role,
                     id: data.user.id
                 }));
+
+                setUser({
+                    email: data.user.email,
+                    name: data.user.name,
+                    role: data.user.role,
+                    id: data.user.id
+                })
 
                 
                 //TODO: Añadir aqui variantes de redireccion segun el rol del usuario
