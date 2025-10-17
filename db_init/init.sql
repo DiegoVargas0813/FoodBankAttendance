@@ -4,7 +4,9 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     username VARCHAR(255) NOT NULL,
     role ENUM('ADMIN','VOLUNTEER','FAMILY','DRIVER') NOT NULL,
-    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    is_confirmed TINYINT(1) DEFAULT '0',
+    confirmation_token VARCHAR(255) DEFAULT NULL
 );
 
 CREATE TABLE user_profiles(
@@ -14,12 +16,13 @@ CREATE TABLE user_profiles(
     FOREIGN KEY (idusers) REFERENCES users(idusers) ON DELETE CASCADE
 );
 
-
 CREATE TABLE families (
 	idfamilies INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idusers INT NOT NULL,
     household_size INT,
     notes TEXT,
+    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
+    form_data JSON,
     FOREIGN KEY (idusers) REFERENCES users(idusers) ON DELETE CASCADE
 );
 

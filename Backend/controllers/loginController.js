@@ -1,4 +1,5 @@
 const loginModel = require('../models/loginModel');
+const familyModel = require('../models/familyModel');
 const { sendConfirmationEmail } = require('../utils/email');
 
 const bcrypt = require('bcrypt'); // For password hashing
@@ -40,17 +41,23 @@ exports.login = async (req, res) => {
     }
 }
 
+// Base User Registration, other roles will be handled in their own controllers
 exports.register = async (req, res) => { 
     const {email,password, username,role} = req.body;
     try {
         const newUser = await loginModel.postNewUser({email,password, username,role});
         
+        //Registration always creates a family record (Roles like administrator and aid_worker can ignore this)
+        let family = null;
+        family = await familyModel.createFamilyForUser(newUser.id);
+
         //Confirmation email
         await sendConfirmationEmail(email, newUser.confirmationToken);
 
         res.status(201).json({ 
             message: 'User registered successfully, check your email',
-            user: newUser
+            user: newUser,
+            family
         });
     } catch (error) {
         console.error(error);

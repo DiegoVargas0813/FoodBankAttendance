@@ -33,6 +33,14 @@
    DB_PASSWORD=your_mysql_password
    DB_NAME=bamx
    ```
+   **OAUTH credentials are also required inside Backend/.env**
+   ```
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_email_password
+   OAUTH_CLIENT_ID=your_oauth_client_id
+   OAUTH_CLIENT_SECRET=your_oauth_client_secret
+   OAUTH_REFRESH_TOKEN=your_oauth_refresh_token
+   ```
 
    **Frontend/bamx/.env**
    ```

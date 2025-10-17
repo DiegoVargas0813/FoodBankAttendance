@@ -13,6 +13,7 @@ import Register from './pages/register';
 import Dashboard from './pages/dashboard';
 import Driver from './pages/driver';
 import ConfirmEmail from './pages/confirmEmail';
+import FormPage from './pages/form';
 
 //Components Import
 import ProtectedRoute from './components/auth/protectedRoute';
@@ -23,11 +24,12 @@ function App() {
       <Routes>
         <Route path="/" element={<Login/>} />
         <Route path="/register" element={<Register/>} />
+        <Route path="/confirm/:token" element={<ConfirmEmail />} />
         {/** Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/driver" element={<Driver/>} />
-          <Route path="/confirm/:token" element={<ConfirmEmail />} />
+          <Route path="/form" element={<FormPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
