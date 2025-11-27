@@ -2,86 +2,92 @@
 
 Fullstack app: Frontend (Vite + React + Tailwind), Backend (Node + Express), DB (MySQL).
 
-This README documents required environment variables (including email), how to seed the first admin user, and short run instructions (local / docker). Do not commit any `.env` or secrets.
+This README documents the environment variables required (OAuth2 email-only), how to seed the first admin user, and quick run instructions (local / Docker). Do not commit any `.env` files or secrets.
 
 ---
 
-## Required environment variables
+## Required environment variables (OAuth2 email only)
 
-### Backend (`./Backend/.env`)
-Minimum set (adjust values for your environment):
+All backend envs -> `./Backend/.env`  
+All frontend envs -> `./Frontend/bamx/.env`
 
+Important: restart services after changing `.env`.
+
+### Backend (`./Backend/.env`) — required / recommended
+
+App / security
 ```env
-# App / security
 NODE_ENV=development
-JWT_SECRET=replace_with_secure_random_string
-JWT_EXPIRES_IN=1h
-REFRESH_TOKEN_EXPIRES_DAYS=30
-TOKEN_VERSION=0
+PORT=3000
+JWT_SECRET=replace_with_secure_random_string       # REQUIRED
+JWT_EXPIRES_IN=1h                                  # e.g. "1h"
+REFRESH_TOKEN_EXPIRES_DAYS=30                      # int
+TOKEN_VERSION=0                                    # integer used to invalidate refresh tokens
+```
 
-# Database
+Database
+```env
 DB_HOST=localhost        # 'mysql' when using docker-compose
 DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_db_password
 DB_NAME=bamx
+```
 
-# Frontend URL (used to build links in emails)
-FRONTEND_URL=http://localhost:5173
-
-# CORS (comma separated). Use exact origins used by browsers, avoid '*' in production
+Frontend / CORS / links
+```env
+FRONTEND_URL=http://localhost:5173                # used to generate links in emails
 CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3001
+                                                  # comma-separated list of allowed browser origins (do not use "*" in production)
+```
 
-# Email - choose one method below
-
-# Option A: SMTP username/password
-EMAIL_TRANSPORT=smtp              # optional flag used by code if present
-EMAIL_USER=you@example.com
-EMAIL_PASS=your_smtp_password
-EMAIL_HOST=smtp.gmail.com         # optional, defaults depend on code
-EMAIL_PORT=587
-EMAIL_SECURE=false                # true for 465
-
-# Option B: Gmail OAuth2 (preferred for Gmail automation)
-# If using OAuth2 the code uses CLIENT_ID/CLIENT_SECRET/REFRESH_TOKEN with EMAIL_USER
+OAuth2 email (Gmail preferred)
+```env
+# set EMAIL_TRANSPORT=oauth2 in code or include these vars; code prefers OAuth2 when CLIENT_ID/CLIENT_SECRET/REFRESH_TOKEN present
+EMAIL_TRANSPORT=oauth2
+EMAIL_USER=you@gmail.com          # address that will appear in From:
 CLIENT_ID=your_google_oauth_client_id
 CLIENT_SECRET=your_google_oauth_client_secret
-REFRESH_TOKEN=your_google_refresh_token
-EMAIL_USER=you@example.com        # same email address used for OAuth2
+REFRESH_TOKEN=google_oauth_refresh_token
 
-# Invite / account management
+# Optional email sending name/brand
+EMAIL_FROM_NAME="Banco de Alimentos BAMX"
+```
+
+Invite / account management / limits
+```env
+INVITE_DEFAULT_HOURS=72                 # hours until invite expires (default)
 UNCONFIRMED_DELETE_DAYS=30
-TEST_CLEANUP=false
-TEST_CLEANUP_INTERVAL_MS=60000
+LOGIN_RATE_LIMIT_WINDOW_MIN=15          # minutes for login rate limiter window
+LOGIN_RATE_LIMIT_MAX=5                  # max attempts per window
+ACCEPT_INVITE_RATE_LIMIT_MAX=5          # max accept-invite attempts per window
 ```
 
 Notes:
-- The backend supports both basic SMTP (EMAIL_PASS) and OAuth2 (CLIENT_ID/CLIENT_SECRET/REFRESH_TOKEN). Provide either set accordingly.
-- FRONTEND_URL must match the public URL users will open (used in confirmation/invite email links).
-- CORS_ALLOWED_ORIGINS must include the Vite dev host (usually `http://localhost:5173`) and any static frontend container host/port.
+- The backend expects OAuth2 credentials (CLIENT_ID / CLIENT_SECRET / REFRESH_TOKEN) to send confirmation/invite emails. Do not provide SMTP username/password here — this README focuses on OAuth2 only.
+- FRONTEND_URL must match the URL users open (used in confirmation/invite email links).
+- CORS_ALLOWED_ORIGINS must include the dev host (e.g. `http://localhost:5173`) and any static frontend host/port you serve.
 
 ---
 
 ### Frontend (`./Frontend/bamx/.env`)
 
 ```env
-# Runtime / build
-VITE_API_URL=http://localhost:3000/api    # API base used by client at runtime (includes /api)
-# Dev server proxy used by Vite (so /api requests are proxied to backend)
-VITE_API_PROXY=http://localhost:3000
+VITE_API_URL=http://localhost:3000/api     # API base used by client at runtime (includes /api)
+VITE_API_PROXY=http://localhost:3000       # Vite dev proxy (so /api requests are proxied to backend in dev)
 ```
 
-- VITE_API_PROXY is used by `vite.config.ts` during `npm run dev`.
-- VITE_API_URL is used by the app at runtime (build or dev).
+Notes:
+- Vite reads VITE_API_PROXY at dev server startup. Restart Vite after editing.
 
 ---
 
-## Seeding the first admin user
+## Seeding the first admin user (bootstrap)
 
-The repo includes `./db_init/init.sql` which creates schema and inserts one admin user automatically when MySQL container initializes (docker mode). If you run locally or need to seed manually, follow one of these:
+Options: automatic via `./db_init/init.sql` (Docker), or manual SQL import / manual insert.
 
-1) Use provided init SQL (docker)
-- When running MySQL container with `./db_init` mounted, `init.sql` runs automatically on first start.
+1) Automatic (Docker)
+- `./db_init/init.sql` runs automatically the first time the MySQL container initializes (when mounted into the official MySQL image). It typically inserts an initial admin row.
 
 2) Manual import (local MySQL)
 ```powershell
@@ -89,38 +95,38 @@ The repo includes `./db_init/init.sql` which creates schema and inserts one admi
 mysql -u root -p -P 3306 bamx < ./db_init/init.sql
 ```
 
-3) Create admin manually (one-time)
-- Generate a bcrypt hash (example using Node + bcryptjs):
+3) Manual insert (one-time) — preferred when not using the init SQL:
+- Generate a bcrypt hash (use Node with bcryptjs). From project root:
 ```bash
 node -e "console.log(require('bcryptjs').hashSync('YourSecurePassword!', 12))"
-# copy printed hash into SQL below
 ```
-- Insert the admin:
+- Copy the printed hash and run SQL (replace `<bcrypt-hash>` and email/username):
 ```sql
 INSERT INTO users (email, password, username, role, is_confirmed, created_at)
 VALUES ('admin@example.org', '<bcrypt-hash>', 'Initial Admin', 'ADMIN', 1, NOW());
 ```
+- Mark `is_confirmed = 1` so the admin is active immediately.
 
-Security note: Keep the seeded admin credentials secure and rotate/reset after first login. Prefer using the invite flow for adding additional admin accounts.
+Security note: keep the seeded admin credentials secure and rotate/reset after first login. Prefer the invite flow for adding further admins.
 
 ---
 
 ## Quick run (local, no Docker)
 
-1. Start MySQL (local) and import schema:
+1) Prepare DB (local MySQL) and import schema:
 ```powershell
 mysql -u root -p -P 3306 bamx < ./db_init/init.sql
 ```
 
-2. Backend
+2) Backend
 ```powershell
 cd ./Backend
 npm install
-# create ./Backend/.env as documented above
+# create ./Backend/.env as documented above (include OAuth2 vars)
 npm run dev
 ```
 
-3. Frontend
+3) Frontend
 ```powershell
 cd ./Frontend/bamx
 npm install
@@ -134,26 +140,43 @@ Open the Vite URL (usually `http://localhost:5173`).
 
 ## Quick run with Docker Compose
 
-1. Edit compose env overrides in `docker-compose.yml` if needed (CORS_ALLOWED_ORIGINS, FRONTEND_URL).
-2. From project root:
+1) Edit `docker-compose.yml` env overrides if needed (`CORS_ALLOWED_ORIGINS`, `FRONTEND_URL`). Ensure `Backend/.env` values align with compose overrides if both are used.
+
+2) From project root:
 ```powershell
 docker-compose down
 docker-compose build --no-cache
 docker-compose up
 ```
+
 - Frontend static container default: `http://localhost:3001`
 - Backend API: `http://localhost:3000`
-- MySQL host mapped to `3308` (container `3306`) per compose.
+- MySQL host mapped to `3308` (container 3306) per compose.
+
+Notes:
+- When backend runs in Docker, set `DB_HOST=mysql` in `./Backend/.env` or rely on compose environment.
+- Rebuild/recreate containers after env changes.
 
 ---
 
-## Email troubleshooting
+## Invite / accept flow (summary)
 
-- If emails do not send:
-  - Confirm correct EMAIL_* env values.
-  - For Gmail OAuth2: ensure CLIENT_ID/CLIENT_SECRET and REFRESH_TOKEN are valid and the Google account permits sending.
-  - Check backend logs for nodemailer errors.
-- For SMTP with Gmail and username/password, Google often blocks less-secure logins; prefer OAuth2.
+- Admins create invites via `POST /api/invites` (admin-only). Invite email contains one-time token link to public accept page.
+- Invite acceptance endpoint: `POST /api/invites/accept` with `{ token, username, password }`.
+- Accept flow requires token, validates password rules, creates user, marks invite used.
+
+Password rules (enforced on accept)
+- Minimum 8 chars, maximum 64
+- At least one letter, one number, and one symbol
+
+---
+
+## Email troubleshooting (OAuth2)
+
+- Ensure CLIENT_ID, CLIENT_SECRET and REFRESH_TOKEN are valid for the EMAIL_USER account.
+- The Google account must allow sending (OAuth consent & scopes configured).
+- If nodemailer reports token/permission errors, refresh the token or check Google Cloud OAuth client settings.
+- Check backend logs for the nodemailer stack trace.
 
 ---
 
@@ -162,7 +185,6 @@ docker-compose up
 - Never commit `.env` files or secrets.
 - Use exact CORS origins (avoid `*` in production).
 - Use HTTPS and strong JWT secrets.
-- Use a persistent store (Redis) for rate-limiters in multi-instance deployments.
 - Use a secrets manager for production credentials.
-
----
+- Use Redis or another shared store for rate-limiters in multi-instance deployments.
+- Prefer invite-based admin onboarding; keep manual DB seed as an emergency bootstrap method.
