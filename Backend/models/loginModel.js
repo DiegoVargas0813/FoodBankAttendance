@@ -110,3 +110,34 @@ exports.setConfirmationTokenForEmail = (email, token) => {
     });
   });
 };
+
+//Password reset token methods
+exports.setPasswordResetForEmail = (email, token, expiresAt) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE users SET password_reset_token = ?, password_reset_expires = ? WHERE email = ?';
+    db.query(sql, [token, expiresAt, email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+exports.findByPasswordResetToken = (token) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'SELECT * FROM users WHERE password_reset_token = ? LIMIT 1';
+    db.query(sql, [token], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows && rows.length ? rows[0] : null);
+    });
+  });
+};
+
+exports.updatePasswordByEmail = (email, hashedPassword) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE users SET password = ?, password_reset_token = NULL, password_reset_expires = NULL WHERE email = ?';
+    db.query(sql, [hashedPassword, email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};

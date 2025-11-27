@@ -5,6 +5,8 @@ CREATE TABLE users (
     username VARCHAR(255) NOT NULL,
     role ENUM('ADMIN','VOLUNTEER','FAMILY','DRIVER') NOT NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    password_reset_token VARCHAR(128) DEFAULT NULL,
+    password_reset_expires DATETIME DEFAULT NULL,
     is_confirmed TINYINT(1) DEFAULT '0',
     confirmation_token VARCHAR(255) DEFAULT NULL,
     token_version int NOT NULL DEFAULT '0'
@@ -75,6 +77,8 @@ CREATE TABLE invites (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (invited_by) REFERENCES users(idusers) ON DELETE SET NULL
 );
+
+CREATE INDEX idx_users_password_reset_token ON users (password_reset_token);
 
 INSERT INTO users (email, password, username, role, is_confirmed)
 values ('A01635782@tec.mx', '$2a$12$ix3oROFt.RQHrQCqVIRUr.KlepovKbr7Tm4rZUwq9HaEub50kCgyi', 'Diego Vargas', 'ADMIN', 1);

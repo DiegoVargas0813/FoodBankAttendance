@@ -19,6 +19,8 @@ import ApprovedList from './pages/approvedList';
 import ProfilePage from './pages/profile';
 import InvitesAdmin from './pages/invitesAdmin';
 import InvitesAcceptAdmin from './pages/invitesAcceptAdmin';
+import ResetPassword from './pages/resetPassword';
+import ForgotPassword from './pages/forgotPassword';
 
 //Components Import
 import ProtectedRoute from './components/auth/protectedRoute';
@@ -32,6 +34,8 @@ function App() {
         <Route path="/confirm/:token" element={<ConfirmEmail />} />
         <Route path="/confirm-notice" element={<ConfirmNotice />} />
         <Route path="/accept-invite" element={<InvitesAcceptAdmin />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
         {/** Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard/>} />

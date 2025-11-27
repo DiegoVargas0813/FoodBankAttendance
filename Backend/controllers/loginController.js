@@ -1,7 +1,8 @@
 const loginModel = require('../models/loginModel');
 const familyModel = require('../models/familyModel');
 const refreshTokenModel = require('../models/refreshTokenModel');
-const { sendConfirmationEmail } = require('../utils/email');
+const { sendConfirmationEmail, sendResetEmail } = require('../utils/email');
+
 
 const bcrypt = require('bcrypt'); // For password hashing
 const jwt = require('jsonwebtoken'); // For JWT handling
@@ -10,6 +11,7 @@ const crypto = require('crypto'); // For generating tokens
 const JWT_SECRET = process.env.JWT_SECRET  // Ensure you have this in your .env file
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h'; // keep short
 const REFRESH_TOKEN_EXPIRES_DAYS = Number(process.env.REFRESH_TOKEN_EXPIRES_DAYS || 30);
+const RESET_EXPIRE_HOURS = Number(process.env.PASSWORD_RESET_HOURS || 2);
 
 // Helper function to sign access tokens
 function signAccessToken(payload){

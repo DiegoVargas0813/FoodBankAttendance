@@ -149,3 +149,44 @@ exports.sendInviteEmail = async (to, token, role = 'ADMIN') => {
     html,
   });
 };
+
+// Reset email function (used in passwordController)
+// ...existing code...
+exports.sendResetEmail = async (to, token) => {
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${encodeURIComponent(token)}`;
+  const primaryHex = '#00943B';
+  const foreground = '#ffffff';
+  const contactEmail = 'comunicacionbamx@bdalimentos.org';
+
+  const html = `
+    <!doctype html><html><body style="font-family:system-ui, -apple-system, 'Segoe UI', Roboto, Arial;">
+      <table width="100%"><tr><td align="center" style="padding:24px">
+        <table width="600" style="max-width:600px;background:#fff;border-radius:8px;overflow:hidden">
+          <tr><td style="background:${primaryHex};color:${foreground};padding:16px;text-align:center"><h2 style="margin:0">Restablecer contraseña — BAMX</h2></td></tr>
+          <tr><td style="padding:20px;color:#111827">
+            <p>Recibimos una solicitud para restablecer la contraseña.</p>
+            <div style="text-align:center;margin:18px 0">
+              <a href="${resetUrl}" style="background:${primaryHex};color:${foreground};padding:10px 16px;border-radius:6px;text-decoration:none;font-weight:600">Restablecer contraseña</a>
+            </div>
+            <p style="font-size:13px;color:#6b7280">Si no solicitaste esto, ignora este correo.</p>
+            <p style="font-size:12px;color:#6b7280;word-break:break-all"><a href="${resetUrl}" style="color:${primaryHex};text-decoration:underline">${resetUrl}</a></p>
+          </td></tr>
+          <tr><td style="background:#f9fafb;padding:12px;text-align:center;color:#6b7280;font-size:13px">
+            <div>Hacienda de la Calerilla 360, Santa Maria Tequepexpan, Tlaquepaque, Jalisco.</div>
+            <div>GDL : 33 3810 6595</div>
+            <div><a href="mailto:${contactEmail}" style="color:${primaryHex};text-decoration:none">${contactEmail}</a></div>
+          </td></tr>
+        </table>
+      </td></tr></table>
+    </body></html>`;
+
+  const text = `Restablece tu contraseña: ${resetUrl}`;
+
+  return transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to,
+    subject: 'Restablece tu contraseña — BAMX',
+    text,
+    html,
+  });
+};

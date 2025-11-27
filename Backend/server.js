@@ -82,6 +82,7 @@ const familyRoute = require('./routes/familyRoute');
 const authRoute = require('./routes/authRoute');
 const mediaRoute = require('./routes/mediaRoute');
 const inviteRoute = require('./routes/inviteRoute');
+const passwordRoute = require('./routes/passwordRoute');
 
 // Usar rutas (CORS already applied)
 app.use('/api/users', userRoute); // Rutas para usuarios (protegidas)
@@ -92,6 +93,7 @@ app.use('/api/auth', authRoute); // Rutas para autenticación y tokens
 app.use('/api/media', mediaRoute); // Rutas para gestión de medios
 app.use('/api/confirm', confirmRoute); // Ruta para confirmación de email
 app.use('/api/invites', inviteRoute); // Rutas para gestión de invitaciones
+app.use('/api/auth', passwordRoute); // Rutas para gestión de contraseñas
 
 // Iniciar el servidor
 const port = process.env.PORT || 3000;
