@@ -49,23 +49,15 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3001
 OAuth2 email (Gmail recommended) — OAUTH2 only
 ```env
 # Use OAuth2 credentials to send mail via nodemailer
-EMAIL_TRANSPORT=oauth2
 EMAIL_USER=you@gmail.com          # FROM address
 CLIENT_ID=your_google_oauth_client_id
 CLIENT_SECRET=your_google_oauth_client_secret
 REFRESH_TOKEN=google_oauth_refresh_token
-
-# Optional display name
-EMAIL_FROM_NAME="Banco de Alimentos BAMX"
 ```
 
 Invite / account management / limits
 ```env
-INVITE_DEFAULT_HOURS=72                 # hours until invite expires (default)
 UNCONFIRMED_DELETE_DAYS=30
-LOGIN_RATE_LIMIT_WINDOW_MIN=15          # minutes for login rate limiter window
-LOGIN_RATE_LIMIT_MAX=5                  # max attempts per window
-ACCEPT_INVITE_RATE_LIMIT_MAX=5          # max accept-invite attempts per window
 ```
 
 Security note: the backend code prefers OAuth2 when CLIENT_ID/CLIENT_SECRET/REFRESH_TOKEN are present. Ensure the Google OAuth client and refresh token have the right scopes to send mail on behalf of EMAIL_USER.
