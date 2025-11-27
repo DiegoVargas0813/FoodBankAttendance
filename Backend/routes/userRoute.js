@@ -4,13 +4,10 @@ const userController = require ('../controllers/userController');
 const authMiddleware = require ('../utils/authMiddleware');
 const roleMiddleware = require ('../utils/roleMiddleware');
 
-//Ejemplo de ruta protegida
-router.get('/protected/:id', authMiddleware.verifyToken, userController.getUserById);
+// GET /api/users/me -> authenticated user's profile
+router.get('/me', authMiddleware.verifyToken, userController.getMe);
 
-//Ejemplo de ruta protegida + control de rol
+// Admin-only: GET /api/users/admin/:id
 router.get('/admin/:id', authMiddleware.verifyToken, roleMiddleware.checkRole('ADMIN'), userController.getUserByIdAdminOnly);
-
-//Ejemplo de ruta no protegida
-router.get('/:id', userController.getUserById);
 
 module.exports = router;

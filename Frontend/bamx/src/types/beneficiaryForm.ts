@@ -52,7 +52,7 @@ export interface FamilyMember {
     weight?: number;
     size?: number;
     BMI?: number; // Body Mass Index (Might as well do the calculation to save people the trouble)
-    indigenous?: boolean;
+    indigenous?: string;
 }
 
 export interface LivingConditions {
@@ -113,6 +113,10 @@ export interface LivingConditions {
         has: boolean;
         functional: boolean;
     }
+    motorcycle:{
+        has: boolean;
+        functional: boolean;
+    }
     computer: {
         has: boolean;
         functional: boolean;
@@ -121,9 +125,22 @@ export interface LivingConditions {
         has: boolean;
         functional: boolean;
     }
+    telephone:{
+        has: boolean;
+        functional: boolean;
+    }
 }
 
 export interface economicConditions {
+    other_support: string;
+    provider_of_support: string;
+    frequency_of_support: string;
+    has_remmittances: boolean;
+    frequency: string;
+    curp: boolean;
+    birth_certificate: boolean;
+    id_card: boolean;
+    ine: boolean;
     weekly_income: {
         father_income: number;
         mother_income: number;

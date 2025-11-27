@@ -35,7 +35,6 @@ function queuePostRequest(request) {
     return tx.complete;
   });
 }
-
 function replayQueuedRequests() {
   return openDB().then(db => {
     const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -47,7 +46,8 @@ function replayQueuedRequests() {
           await fetch(req.url, {
             method: req.options.method,
             headers: req.options.headers,
-            body: req.options.body
+            body: req.options.body,
+            credentials: 'include', // ensure cookies (HttpOnly refresh) are sent
           });
         } catch (e) {
           // If still offline, keep in queue
@@ -94,7 +94,7 @@ self.addEventListener('fetch', event => {
   ) {
     console.log('Intercepted POST to /api');
     event.respondWith(
-      fetch(request.clone())
+      fetch(request.clone(), {credentials: 'include'}) //Include cookies when online
         .catch(() => {
           request.clone().json().then(body => {
             console.log('Queuing POST body:', body);

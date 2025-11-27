@@ -1,45 +1,27 @@
 const userModel = require('../models/userModel');
 
-// Ejemplo de ruta protegida
-//Esta ruta se accede por cualquier usuario autenticado
-exports.getUserByIdProtected = async (req, res) => {
-    try {
-        const user = await userModel.fetchUserById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
+// Return the authenticated user's profile (safe fields only)
+exports.getMe = async (req, res) => {
+  try {
+    const id = req.user?.idusers || req.user?.id;
+    if (!id) return res.status(400).json({ error: 'Missing user id' });
+    const user = await userModel.fetchUserById(id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ user });
+  } catch (err) {
+    console.error('getMe error', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 };
 
-// Ejemplo de ruta protegida + control de rol
-//Esta ruta solo se accede por usuarios con rol 'admin'
+// Admin-only: lookup another user (safe fields only)
 exports.getUserByIdAdminOnly = async (req, res) => {
-    try {
-        const user = await userModel.fetchUserById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
+  try {
+    const user = await userModel.fetchUserById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ user });
+  } catch (error) {
+    console.error('getUserByIdAdminOnly error', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 };
-
-// TODO: Remover una vez se hayan implementado todas las rutas protegidas y con control de rol
-// Ruta desprotegida
-// Esta ruta se accede por cualquier usuario, autenticado o no. Usada principalmente para login o registro.
-exports.getUserById = async (req, res) => {
-    try {
-        const user = await userModel.fetchUserById(req.params.id);
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-        res.json(user);
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
-};
-

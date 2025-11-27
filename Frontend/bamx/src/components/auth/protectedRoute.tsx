@@ -1,21 +1,15 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-const ProtectedRoute = () => {
-  const { isAuthenticated, loading } = useAuth();
+const ProtectedRoute = ({ roles }: { roles?: string[] }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/" replace />;
 
-    // While checking auth status, you can show a loading indicator
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    // If not authenticated, redirect to login
-    if (!isAuthenticated) {
-        return <Navigate to="/" replace />;
-    }
-
-    // Otherwise, render the requested route
-    return <Outlet />;
+  if (roles && !roles.map(r => r.toUpperCase()).includes(user.role?.toUpperCase())) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

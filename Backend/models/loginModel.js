@@ -4,6 +4,15 @@ const bcrypt = require('bcrypt'); // For password hashing
 //This model composes the logic for the login route, which is our only unprotected route.
 //Any other routes will require a valid JWT token to access, which will be granted upon successful login.
 
+exports.fetchUserById = (id) => {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT * FROM users WHERE idusers = ? LIMIT 1', [id], (err, rows) => {
+      if (err) return reject(err);
+      resolve(rows && rows.length ? rows[0] : null);
+    });
+  });
+};
+
 exports.fetchUserByEmail = (email) => {
     return new Promise((resolve, reject) => {
         db.query('SELECT * FROM users WHERE email = ?', [email], (err, rows) => {
@@ -14,6 +23,7 @@ exports.fetchUserByEmail = (email) => {
         });
     });
 }
+
 
 //Note: check the code matching with DB schema
 //DOING: Adding email confirmation token logic
@@ -47,4 +57,56 @@ exports.postNewUser = async (user) => {
             }
         );
     });
+};
+
+exports.getTokenVersion = (userId) => {
+  return new Promise((resolve, reject) => {
+    db.query('SELECT token_version FROM users WHERE idusers = ? LIMIT 1', [userId], (err, rows) => {
+      if (err) return reject(err);
+      if (!rows || !rows.length) return resolve(null);
+      resolve(rows[0].token_version || 0);
+    });
+  });
+};
+
+exports.incrementTokenVersion = (userId) => {
+  return new Promise((resolve, reject) => {
+    db.query('UPDATE users SET token_version = token_version + 1 WHERE idusers = ?', [userId], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+// NEW: delete unconfirmed user by email
+exports.deleteUnconfirmedByEmail = (email) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM users WHERE email = ? AND is_confirmed = FALSE';
+    db.query(sql, [email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+// NEW: delete unconfirmed accounts older than N days
+exports.deleteUnconfirmedOlderThanDays = (days = 30) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'DELETE FROM users WHERE is_confirmed = FALSE AND created_at < DATE_SUB(NOW(), INTERVAL ? DAY)';
+    db.query(sql, [days], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
+
+
+exports.setConfirmationTokenForEmail = (email, token) => {
+  return new Promise((resolve, reject) => {
+    const sql = 'UPDATE users SET confirmation_token = ? WHERE email = ?';
+    db.query(sql, [token, email], (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
 };

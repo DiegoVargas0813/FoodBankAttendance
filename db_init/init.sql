@@ -6,22 +6,23 @@ CREATE TABLE users (
     role ENUM('ADMIN','VOLUNTEER','FAMILY','DRIVER') NOT NULL,
     created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     is_confirmed TINYINT(1) DEFAULT '0',
-    confirmation_token VARCHAR(255) DEFAULT NULL
+    confirmation_token VARCHAR(255) DEFAULT NULL,
+    token_version int NOT NULL DEFAULT '0'
 );
 
-CREATE TABLE user_profiles(
-	iduser_profiles INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    idusers INT NOT NULL, 
-    full_name VARCHAR(100) NOT NULL,
-    FOREIGN KEY (idusers) REFERENCES users(idusers) ON DELETE CASCADE
+CREATE TABLE `refresh_tokens` (
+  idtokens int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  idusers int NOT NULL,
+  token_hash varchar(128) NOT NULL,
+  expires_at datetime NOT NULL,
+  created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+  FOREIGN KEY (idusers) REFERENCES users (idusers) ON DELETE CASCADE
 );
 
 CREATE TABLE families (
 	idfamilies INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     idusers INT NOT NULL,
-    household_size INT,
-    notes TEXT,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') DEFAULT 'PENDING',
+    status varchar(20) NOT NULL DEFAULT 'pending',
     form_data JSON,
     FOREIGN KEY (idusers) REFERENCES users(idusers) ON DELETE CASCADE
 );
@@ -32,7 +33,6 @@ CREATE TABLE volunteers (
     availability VARCHAR(50),
     FOREIGN KEY (idusers) REFERENCES users(idusers) ON DELETE CASCADE
 );
-
 
 CREATE TABLE events (
 	idevents INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -62,6 +62,18 @@ CREATE TABLE media_files(
     file_type ENUM('ID_PHOTO', 'ADDRESS_PHOTO') NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (idusers) REFERENCES users(idusers) ON DELETE CASCADE
+);
+
+CREATE TABLE invites (
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  role ENUM('ADMIN','VOLUNTEER','FAMILY','DRIVER') NOT NULL DEFAULT 'ADMIN',
+  token VARCHAR(128) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  invited_by INT DEFAULT NULL,
+  used BOOLEAN NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (invited_by) REFERENCES users(idusers) ON DELETE SET NULL
 );
 
 INSERT INTO users (email, password, username, role)

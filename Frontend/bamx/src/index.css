@@ -1,74 +1,85 @@
-
-/*CSS data from previous project*/
-
-/*While the editor mentions tailwind as unknown, it is actually a valid directive. Same with reference*/
 @import "tailwindcss";
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
+/* -----------------------------------------
+   1. Tailwind 4 THEME (all colors go here)
+----------------------------------------- */
+@theme {
+  /* You can keep LCH or HSL — both work */
 
-    --card: 144 100% 29%;
-    --card-foreground: 240 10% 3.9%;
+  /* BAMX Green Theme */
+  --color-primary: 144 100% 29%;
+  --color-primary-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
+  /* BAMX Red Theme */
+  --secondary: 350 87% 43%;
+  --secondary-foreground: 210 50% 23%;
 
-    /* BA MX Green */
-    --primary: 144 100% 29%;
-    --primary-foreground: 0 0% 98%;
+  --muted: 210 15% 95%;
+  --muted-foreground: 240 3.8% 46.1%;
 
-    /* BA MX Light Gray */
-    --secondary: 210 15% 95%;
-    --secondary-foreground: 210 50% 23%;
+  --accent: 210 15% 95%;
+  --accent-foreground: 210 50% 23%;
 
-    --muted: 210 15% 95%;
-    --muted-foreground: 240 3.8% 46.1%;
+  --card: 144 100% 29%;
+  --card-foreground: 240 10% 3.9%;
 
-    --accent: 210 15% 95%;
-    --accent-foreground: 210 50% 23%;
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 358 75% 43%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 358 75% 43%;
 
-    --radius: 0.5rem;
+  --radius: 0.5rem;
 
-    /* Oracle Blue for sidebar */
-    --sidebar-background: 210 50% 23%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 144 100% 29%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 210 30% 18%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 210 40% 28%;
-    --sidebar-ring: 358 75% 43%;
-  }
+  /* Sidebar theme */
+  --sidebar-background: 210 50% 23%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-primary: 144 100% 29%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 210 30% 18%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-border: 210 40% 28%;
+  --sidebar-ring: 358 75% 43%;
+
+  /* Layout */
+  --page-padding: 2rem;
+  --sidebar-width: 240px;
 }
 
+/* -----------------------------------------
+   2. Base overrides (optional)
+----------------------------------------- */
 @layer base {
-  * {
-    border-color: hsl(var(--border));
-  }
-
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  * {
+    border-color: hsl(var(--border));
+  }
 }
+
+/* -----------------------------------------
+   3. Custom utilities
+----------------------------------------- */
 @layer utilities {
   .focus-ring:focus-visible {
     outline: none;
-    ring-width: 2px;
     --tw-ring-color: hsl(var(--primary));
+    ring-width: 2px;
     ring-offset-width: 2px;
   }
-  
+
+  .bg-primary {
+    background-color: hsl(var(--color-primary));
+    color: hsl(var(--color-primary-foreground));
+  }
+
   .card-hover {
     transition: all 0.3s;
   }
@@ -84,7 +95,6 @@
     background-color: hsl(var(--muted));
     position: relative;
   }
-  
   .loading-bar::after {
     content: "";
     position: absolute;
@@ -93,28 +103,33 @@
     background-color: hsl(var(--primary));
     animation: loader 1.5s infinite linear;
   }
-  
+
   .sidebar-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background-color: hsl(var(--sidebar-background));
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-radius: 0.375rem;
-    color: hsl(var(--sidebar-foreground));
-    transition-property: background-color, color;
-    transition-duration: 200ms;
+    @apply flex items-center gap-2 bg-[hsl(var(--sidebar-background))] px-3 py-2 rounded-md text-[hsl(var(--sidebar-foreground))] transition-colors duration-200;
   }
   .sidebar-link:hover {
     background-color: hsl(var(--sidebar-accent));
     color: hsl(var(--sidebar-accent-foreground));
   }
-  
   .sidebar-link.active {
     background-color: hsl(var(--sidebar-primary));
     color: hsl(var(--sidebar-primary-foreground));
   }
-} 
+}
+
+/* -----------------------------------------
+   4. Responsive theme overrides
+----------------------------------------- */
+@media (max-width: 768px) {
+  @theme {
+    --radius: 0.375rem;
+    --page-padding: 1rem;
+    --sidebar-width: 70px;
+    --sidebar-background: 210 40% 20%;
+  }
+}
+
+/* Layout helpers */
+.container-main {
+  padding: var(--page-padding);
+}

@@ -1,7 +1,8 @@
 // Define the structure of the form schema
 // Here we can alter the form sections and fields as needed, instead of hardcoding them in components
 
-export type FieldType = 'text' | 'number' | 'date' | 'select' | 'checkbox';
+// Asset list field type for appliances and equipment
+export type FieldType = 'text' | 'number' | 'date' | 'select' | 'checkbox' | 'asset_list' | 'title';
 
 export interface FormField {
     name: string;
@@ -24,6 +25,9 @@ export interface FormSection {
     fields: FormField[];
 }
 
+export interface LivingConditions {
+    assets?: Record<string, { has: boolean; functional: boolean;}>;
+}
 //#region Family Member Subsections Fields
 
 export const familyMemberGeneralFields: FormField[] = [
@@ -52,7 +56,7 @@ export const familyMemberGeneralFields: FormField[] = [
     },
     { 
         name: 'relationship_to_head', 
-        label: 'Parentesco con el jefe de familia',
+        label: 'Parentesco',
         type: 'select',
         options: [
             {label:'Titular', value:'titular'},
@@ -153,11 +157,158 @@ export const familyMemberEmploymentEducationFields: FormField[] = [
 
 
 export const familyMemberHealthFields: FormField[] = [
-    { name: 'health_status', label: 'Estado de salud', type: 'text' },
-    // ...other health fields
+    { name: 'has_disability', label: 'Capacidades diferentes', type:'select', options: [
+        { label: 'N/A', value: 'N/A'},
+        { label: 'Sensoriales y de Comunicación', value: 'sensoriales_comunicacion'},
+        { label: 'Motrices', value: 'motrices'},
+        { label: 'Aprendizaje y Comportamiento', value: 'aprendizaje_comportamiento'},
+        { label: 'Mas de 1 discapacidad', value: 'mas_de_1_discapacidad'},
+    ] },
+    { name: 'health_issues', label: 'Condiciones de salud', type:'select', options: [
+        { label: 'N/A', value: 'N/A'},
+        { label: 'Infeccionsas (Hepatitis, ETS, virus)', value: 'infecciosas'},
+        { label: 'Tumores (malignos y no malignos)', value: 'tumores'},
+        { label: 'De la sangre (anemias)', value: 'sanguineas'},
+        { label: 'Diabetes, tiroides, obesidad', value: 'diabetes_tiroides_obesidad'},
+        { label: 'Desordenes mentales (esquizofrenia)', value: 'desordenes_mentales'},
+        { label: 'Sistema nervioso (neuropatías)', value: 'sistema_nervioso'},
+        { label: 'Enfermedades de los sentidos', value: 'enfermedades_sentidos'},
+        { label: 'Sistema circulatorio (hipertensión)', value: 'sistema_circulatorio'},
+        { label: 'Sistema respiratorio (neumonía)', value: 'sistema_respiratorio'},
+        { label: 'Sistema digestivo (colitis, hernias)', value: 'sistema_digestivo'},
+        { label: 'De la piel (dermatitis)', value: 'piel'},
+        { label: 'Genitourinario (insuficiencia renal)', value: 'genitourinario'},
+        { label: 'Malformaciones', value: 'malformaciones'},
+        { label: 'Lesiones, heridas, intoxicaciones', value: 'lesiones_heridas_intoxicaciones'},
+        { label: 'Síntomas no clasificados', value: 'sintomas_no_clasificados'},
+    ]},       
+    { name: 'adictions', label: 'Adicciones', type:'select', options: [
+        { label: 'N/A', value: ''},
+        { label: 'Tabaquismo', value: 'tabaquismo'},
+        { label: 'Alcoholismo', value: 'alcoholismo'},
+        { label: 'Drogadicción', value: 'drogadiccion'},
+    ]},
+    { name: 'weight', label: 'Peso (kg)', type: 'number' },
+    { name: 'size', label: 'Talla', type: 'number' },
+    { name: 'BMI', label: 'Índice de Masa Corporal (IMC)', type: 'number' },
+    { name: 'indigenous', label: 'Pueblo Indígena', type: 'select', options: [
+        { label: 'N/A', value: 'N/A'},
+        { label: 'Aketeko', value: 'aketeko'},
+        { label: 'Amuzgo', value: 'amuzgo'},
+        { label: 'Awaketeko', value: 'awaketeko'},
+        { label: 'Apayapaneco', value: 'apayapaneco'},
+        { label: 'Cora', value: 'cora'},
+        { label: 'Cucapá', value: 'cucapa'},
+        { label: 'Cuicateco', value: 'cuicateco'},
+        { label: 'Chatino', value: 'chatino'},
+        { label: 'Chichimeco', value: 'chichimeco'},
+        { label: 'Chinanteco', value: 'chinanteco'},
+        { label: 'Chochotelco', value: 'chochotelco'},
+        { label: 'Chontal Oaxaca', value: 'chontal_oaxaca'},
+        { label: 'Chontal Tabasco', value: 'chontal_tabasco'},
+        { label: 'Chuj', value: 'chuj'},
+        { label: 'Ch´ol', value: 'chol'}, 
+        { label: 'Guarijío', value: 'guarijio'},
+        { label: 'Huasteco', value: 'huasteco'},
+        { label: 'Huave', value: 'huave'},
+        { label: 'Huichol', value: 'huichol'},
+        { label: 'Ixcateco', value: 'ixcateco'},
+        { label: 'Ixil', value: 'ixil'},
+        { label: 'Jakalteco', value: 'jakalteco'},
+        { label: 'Kaqchikel', value: 'kaqchikel'},
+        { label: 'Kickapoo', value: 'kickapoo'},
+        { label: 'Kiliwa', value: 'kiliwa'},
+        { label: 'Kumiai', value: 'kumiai'},
+        { label: 'Ku´ahl', value: 'kuahl'},
+        { label: 'K´iche´', value: 'kiche'},
+        { label: 'Lacandon', value: 'lacandon'},
+        { label: 'Mam', value: 'mam'},
+        { label: 'Matlatzinca', value: 'matlatzinca'},
+        { label: 'Maya', value: 'maya'},
+        { label: 'Mayo', value: 'mayo'},
+        { label: 'Mazahua', value: 'mazahua'},
+        { label: 'Mazateco', value: 'mazateco'},
+        { label: 'Mixe', value: 'mixe'},
+        { label: 'Mixteco', value: 'mixteco'},
+        { label: 'Náhuatl', value: 'nahuatl'},
+        { label: 'Oluteco', value: 'oluteco'},
+        { label: 'Otomí', value: 'otomi'},
+        { label: 'Paipai', value: 'paipai'},
+        { label: 'Pame', value: 'pame'},
+        { label: 'Pápago', value: 'papago'},
+        { label: 'Pima', value: 'pima'},
+        { label: 'Popoloca', value: 'popoloca'},
+        { label: 'Popoluca', value: 'popoluca'},
+        { label: 'Qato´k', value: 'qatok'},
+        { label: 'Qánjobál', value: 'qanjobal'},
+        { label: 'Qéchi´', value: 'qechi'},
+        { label: 'Saylteco', value: 'saylteco'},
+        { label: 'Seri', value: 'seri'},
+        { label: 'Tarahumara', value: 'tarahumara'},
+        { label: 'Tarasco', value: 'tarasco'},
+        { label: 'Teko', value: 'teko'},
+        { label: 'Tepehua', value: 'tepehua'},
+        { label: 'Tepehuano Norte', value: 'tepehuano_norte'},
+        { label: 'Tepehuano Sur', value: 'tepehuano_sur'},
+        { label: 'Texistepequeño', value: 'texistepequeno'},
+        { label: 'Tojolabal', value: 'tojolabal'},
+        { label: 'Totonaco', value: 'totonaco'},
+        { label: 'Triqui', value: 'triqui'},
+        { label: 'Tlahuica', value: 'tlahuica'},
+        { label: 'Tlapaneco', value: 'tlapaneco'},
+        { label: 'Tseltal', value: 'tseltal'},
+        { label: 'Tsotsil', value: 'tsotsil'},
+        { label: 'Yaqui', value: 'yaqui'},
+        { label: 'Zapoteco', value: 'zapoteco'},
+        { label: 'Zoque', value: 'zoque'},
+    ]},
+
 ];
 
 //#endregion
+
+export const economicWeeklyIncomeFields: FormField[] = [
+    { name: 'father_income', label: 'Ingreso semanal — padre', type: 'number' },
+    { name: 'mother_income', label: 'Ingreso semanal — madre', type: 'number' },
+    { name: 'offspring_income', label: 'Ingreso semanal — hijos', type: 'number' },
+    { name: 'PROSPERA_program', label: 'Ingreso semanal — PROSPERA', type: 'number' },
+    { name: 'scholarships', label: 'Ingreso semanal — Becas', type: 'number' },
+    { name: 'other', label: 'Ingreso semanal — Otros', type: 'number' },
+    { name: 'pension', label: 'Ingreso semanal — Pensión', type: 'number' },
+];
+
+export const economicWeeklyExpensesFields: FormField[] = [
+    { name: 'housing', label: 'Gasto semanal — Vivienda (renta, mantenimiento)', type: 'number' },
+    { name: 'food', label: 'Gasto semanal — Alimentación', type: 'number' },
+    { name: 'electricity', label: 'Gasto semanal — Electricidad', type: 'number' },
+    { name: 'gas', label: 'Gasto semanal — Gas', type: 'number' },
+    { name: 'water', label: 'Gasto semanal — Agua', type: 'number' },
+    { name: 'phone_internet', label: 'Gasto semanal — Teléfono / Internet', type: 'number' },
+    { name: 'transportation', label: 'Gasto semanal — Transporte', type: 'number' },
+    { name: 'medical', label: 'Gasto semanal — Salud / Medicinas', type: 'number' },
+    { name: 'other', label: 'Gasto semanal — Otros', type: 'number' },
+    { name: 'cell_phone', label: 'Gasto semanal — Teléfono celular (recarga)', type: 'number' },
+    { name: 'education', label: 'Gasto semanal — Educación', type: 'number' },
+];
+
+export const nutritionalAdultQuestions: FormField[] = [
+  { name: 'question_1', label: 'Alguna vez un adulto tuvo alimentación basada en poca variedad de alimentos?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_2', label: 'Alguna vez un adulto dejó de desayunar, comer o cenar?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_3', label: 'Alguna vez un adulto comió menos de lo que piensa que debía comer?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_4', label: 'Alguna vez se quedaron sin comida?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_5', label: 'Alguna vez un adulto sintió hambre, pero no comió?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_6', label: 'Alguna vez un adulto sólo comió una vez al día o dejó de comer durante un día?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+];
+
+export const nutritionalChildQuestions: FormField[] = [
+  { name: 'question_7', label: 'Alguna vez un menor de 18 tuvo alimentación basada en poca variedad?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_8', label: 'Alguna vez un menor comió menos de lo que debía?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_9', label: 'Alguna vez tuvieron que disminuir la cantidad servida a un menor?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_10', label: 'Alguna vez un menor sintió hambre, pero no comió?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_11', label: 'Algún menor se durmió con hambre?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+  { name: 'question_12', label: 'Alguna vez un menor comió una vez al día o dejó de comer todo un día?', type: 'select', options: [{label:'Sí',value:'yes'},{label:'No',value:'no'}] },
+];
+
 
 export const formSchema: FormSection[] = [
     // General data section
@@ -166,8 +317,8 @@ export const formSchema: FormSection[] = [
         title: 'Datos Generales',
         fields: [
             { name: 'community_name', label: 'Nombre de la comunidad', type: 'text', required: true },
-            { name: 'group', label: 'Grupo', type: 'text' },
-            { name: 'date', label: 'Fecha', type: 'date' },  
+            { name: 'group', label: 'Grupo', type: 'text', required: true },
+            { name: 'date', label: 'Fecha', type: 'date', required: true },  
             { name: 'state', label: 'Estado', type: 'text', required: true },
             { name: 'municipality', label: 'Municipio', type: 'text', required: true },
             { name: 'locality', label: 'Localidad', type: 'text', required: true },
@@ -234,7 +385,7 @@ export const formSchema: FormSection[] = [
             { name: 'postal_code', label: 'Código Postal', type: 'text', required: true },
             { name: 'between_streets', label: 'Entre calles', type: 'text' },
             { name: 'description_of_location', label: 'Descripción del lugar', type: 'text' },
-            { name: 'cell_phone', label: 'Teléfono celular', type: 'text' },
+            { name: 'cell_phone', label: 'Teléfono celular', type: 'text', required: true  },
         ],
     },
     //Services section with checkboxes
@@ -325,5 +476,136 @@ export const formSchema: FormSection[] = [
         key: 'familyMembers',
         title: 'Estructura Familiar',
         fields: [], // Handled separately in the component
+    },
+    {
+        key: 'LivingConditions',
+        title: 'Vivienda y Equipamiento',
+        fields:[
+            { name: 'type_of_housing', label: 'Tipo de casa', type: 'select', options: [
+                { label: 'Unifamiliar', value: 'unifamiliar' },
+                { label: 'Dúplex', value: 'duplex' },
+                { label: 'Compartida', value: 'compartida' },
+                { label: 'Otra', value: 'otra' },
+                { label: 'Independiente', value: 'independiente' },
+                { label: 'U. Habitacional', value: 'unidad_habitacional' },
+                { label: 'Vecindad', value: 'vecindad' },
+                { label: 'Anexo a casa', value: 'anexo_a_casa' },
+                { label: 'Vivienda móvil', value: 'vivienda_movil' },
+                { label: 'Refugio', value: 'refugio' },
+            ]},
+            { name: 'type_of_floor', label: 'Mayor parte de piso', type: 'select', options: [
+                { label: 'Madera, Duela', value: 'madera_duela' },
+                { label: 'Mosaico, Vinil', value: 'mosaico_vinil' },
+                { label: 'Cemento o firme', value: 'cemento_firme' },
+                { label: 'Tierra', value: 'tierra' },
+                { label: 'Otros', value: 'otros' },
+            ]},
+            { name: 'tenencia', label: 'Tenencia', type: 'select', options: [
+                { label: 'Propia', value: 'propia' },
+                { label: 'Rentada', value: 'rentada' },
+                { label: 'Pagándose', value: 'pagandose' },
+                { label: 'Prestada', value: 'prestada' },
+                { label: 'Asentamiento Irregular', value: 'asentamiento_irregular' },
+                { label: 'Otro', value: 'otro' },
+            ]},
+            { name: 'type_of_roof', label: 'Mayor parte de techo', type: 'select', options: [
+                { label: 'Concreto, losa o viguetas', value: 'concreto_losa_viguetas' },
+                { label: 'Lámina de cartón', value: 'lamina_carton' },
+                { label: 'Otros', value: 'otros' },
+                { label: 'Lámina de asbesto, metálica', value: 'lamina_asbesto' },
+                { label: 'Madera, teja', value: 'madera_teja' },
+                { label: 'Paja o palma', value: 'paja_palma' },
+            ]},
+            { name: 'type_of_walls', label: 'Mayor parte de muros', type: 'select', options: [
+                { label: 'Madera', value: 'madera' },
+                { label: 'Adobe', value: 'adobe' },
+                { label: 'Ladrillo, tabique', value: 'ladrillo_tabique' },
+                { label: 'Otros', value: 'otros' },
+                { label: 'Lámina metalica, asbesto', value: 'lamina_metalica_asbesto' },
+                { label: 'Desechos, cartón', value: 'desechos_carton' },
+                { label: 'Carrizo, bambú', value: 'carrizo_bambu' },
+            ]},
+            { name: 'number_of_rooms', label: 'Número de cuartos', type: 'number' },
+            { name: 'number_of_bedrooms', label: 'Número de cuartos para dormir', type: 'number' },
+            { name: 'separate_kitchen', label: 'Cocina separada', type: 'select', options: [
+                { label: 'Sí', value: 'si' },
+                { label: 'No', value: 'no' },
+            ]},
+            { name: 'exclusive_bathroom', label: 'Baño exclusivo', type: 'select', options: [
+                { label: 'Sí', value: 'si' },
+                { label: 'No', value: 'no' },
+            ]},
+            {
+                name: 'assets',
+                label: 'Bienes y Electrodomésticos',
+                type: 'asset_list',
+                options: [
+                    { label: 'Refrigerador', value: 'refrigerator' },
+                    { label: 'Estufa', value: 'stove' },
+                    { label: 'Video, DVD, Blue-Ray', value: 'video_player' },
+                    { label: 'Lavadora', value: 'washing_machine' },
+                    { label: 'Licuadora', value: 'blender' },
+                    { label: 'Televisión', value: 'television' },
+                    { label: 'Radio, bocina, estéreo', value: 'radio_or_stereo' },
+                    { label: 'Sala', value: 'living_room' },
+                    { label: 'Comedor', value: 'dining_room' },
+                    { label: 'Automóvil', value: 'car' },
+                    { label: 'Cama', value: 'bed' },
+                    { label: 'Celular', value: 'cellphone' },
+                    { label: 'Motocicleta', value: 'motorcycle' },
+                    { label: 'Computadora', value: 'computer' },
+                    { label: 'Horno, microondas', value: 'oven_or_microwave' },
+                    { label: 'Teléfono', value: 'telephone' },
+                ],
+            }
+        ],
+    },
+    { 
+        key: 'economicConditions',
+        title: 'Condiciones Económicas',
+        fields: [
+            { name: 'support_title', label: 'Apoyo en especie', type: 'title' },
+            { name: 'other_support', label: 'Tipo de apoyo en especie (describa)', type: 'text' },
+            { name: 'provider_of_support', label: 'Proveedor del apoyo', type: 'text' },
+            { name: 'frequency_of_support', label: 'Frecuencia del apoyo en especie', type: 'text'},
+
+            // Remittances
+            { name: 'remittances_title', label: 'Remesas', type: 'title' },
+            { name: 'has_remmittances', label: 'Recibe remesas', type: 'select', options: [
+                { label: 'Sí', value: 'si' },
+                { label: 'No', value: 'no' },
+            ]},
+            { name: 'frequency', label: 'Frecuencia de remesas', type: 'text'},
+
+            // Identity documents
+            { name: 'identity_title', label: 'Identidad', type: 'title' },
+            { name: 'curp', label: 'CURP', type: 'select', options: [
+                { label: 'Sí', value: 'si' },
+                { label: 'No', value: 'no' },
+            ]},
+            { name: 'birth_certificate', label: 'Acta de nacimiento', type: 'select', options: [
+                { label: 'Sí', value: 'si' },
+                { label: 'No', value: 'no' },
+            ]},
+            { name: 'id_card', label: 'Credencial (otro)', type: 'select', options: [
+                { label: 'Sí', value: 'si' },
+                { label: 'No', value: 'no' },
+            ]},
+            { name: 'ine', label: 'INE', type: 'select', options: [
+                { label: 'Sí', value: 'si' },
+                { label: 'No', value: 'no' },
+            ]}, 
+        ],
+    },
+    {
+        key: 'nutritionalStatus',
+        title: 'Estado Nutricional',
+        fields: [ 
+        ], // Handled separately in the component
+    },
+    {
+        key: 'mediaFiles',
+        title: 'Documentos',
+        fields: []
     }
 ];

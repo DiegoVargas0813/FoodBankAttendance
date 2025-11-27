@@ -1,5 +1,6 @@
 import React from 'react';
 import type { FormField } from './formSchema';
+import AssetListField from './AssetListField';
 
 type Props = {
   field: FormField;
@@ -43,10 +44,21 @@ const FieldRenderer = ({ field, value, onChange }: Props) => {
       onChange(checked);
       return;
     }
+    if (field.type === 'number') {
+      onChange(Number(inputValue || 0));
+    return;
+}
     onChange(inputValue);
   };
 
   // Render logic
+  if (field.type === 'title'){
+    return(
+      <div className="py-2 my-2 border-b">
+        <h3 className="text-lg font-semibold">{field.label}</h3>
+      </div>  
+    );
+  }
   if (field.type === 'text' || field.type === 'date' || field.type === 'number') {
     return (
       <input
@@ -54,7 +66,7 @@ const FieldRenderer = ({ field, value, onChange }: Props) => {
         name={field.name}
         value={value || ''}
         onChange={handleInput}
-        className="border p-2 w-full"
+        className="border p-3 w-full rounded-md text-sm md:text-base"
         required={field.required}
       />
     );
@@ -65,7 +77,7 @@ const FieldRenderer = ({ field, value, onChange }: Props) => {
         name={field.name}
         value={value || ''}
         onChange={handleInput}
-        className="border p-2 w-full"
+        className="border p-3 w-full rounded-md text-sm md:text-base hover:border-blue-400"
         required={field.required}
       >
         <option value="">Seleccione...</option>
@@ -79,7 +91,7 @@ const FieldRenderer = ({ field, value, onChange }: Props) => {
     return (
       <div className="flex flex-wrap gap-2 mt-2">
         {field.options.map(opt => (
-          <label key={opt.value} className="flex items-center gap-1">
+          <label key={opt.value} className="flex items-center gap-2 py-1 px-2 rounded-md hover:bg-blue-200 border">
             <input
               type="checkbox"
               name={field.name}
@@ -101,6 +113,15 @@ const FieldRenderer = ({ field, value, onChange }: Props) => {
         checked={!!value}
         onChange={handleInput}
         className="ml-2"
+      />
+    );
+  }
+  if (field.type === 'asset_list') {
+    return (
+      <AssetListField
+        field={field}
+        value={value}
+        onChange={onChange}
       />
     );
   }
