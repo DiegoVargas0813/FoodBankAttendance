@@ -7,6 +7,7 @@
   "compilerOptions": {
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "types": ["node", "vite/client"]
   }
 }

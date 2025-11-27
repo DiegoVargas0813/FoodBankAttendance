@@ -2,443 +2,167 @@
 
 Fullstack app: Frontend (Vite + React + Tailwind), Backend (Node + Express), DB (MySQL).
 
-This README describes two ways to run the app locally:
-- Without Docker (install services locally)
-- With Docker Compose (recommended for parity)
+This README documents required environment variables (including email), how to seed the first admin user, and short run instructions (local / docker). Do not commit any `.env` or secrets.
 
-General notes
-- Project root: . (this repository root)
-- Frontend folder: ./Frontend/bamx
-- Backend folder: ./Backend
-- Default ports in examples:
-  - Backend API: http://localhost:3000 (container: backend:3000)
-  - Frontend (static container): http://localhost:3001 (Vite dev usually at http://localhost:5173)
-  - MySQL (host mapped in compose): 3308 -> container 3306
+---
 
-Important env keys (examples — never commit secrets)
-- Backend/.env
-  - DB_HOST=mysql (when running in Docker) or localhost (local run)
-  - DB_USER=root
-  - DB_PASSWORD=...
-  - DB_NAME=bamx
-  - JWT_SECRET=...
-  - FRONTEND_URL=http://localhost:5173 (URL used in emails)
-  - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3001
-  - EMAIL_USER, CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN (for nodemailer OAuth2)
-- Frontend/bamx/.env
-  - VITE_API_URL=http://localhost:3000/api  (used at runtime)
-  - VITE_API_PROXY=http://localhost:3000     (Vite dev server proxy)
+## Required environment variables
 
----------------------------------------------------------------------------------------------------
-RUNNING WITHOUT DOCKER (development)
----------------------------------------------------------------------------------------------------
+### Backend (`./Backend/.env`)
+Minimum set (adjust values for your environment):
 
-1) Prepare DB
-- Install MySQL 8 locally and start it.
-- Create the database and import schema/seed (project ships ./db_init/init.sql).
-  Example (from project root):
-  ```powershell
-  mysql -u root -p -P 3306 bamx < ./db_init/init.sql
-  ```
-  Adjust port if your MySQL uses a different port.
+```env
+# App / security
+NODE_ENV=development
+JWT_SECRET=replace_with_secure_random_string
+JWT_EXPIRES_IN=1h
+REFRESH_TOKEN_EXPIRES_DAYS=30
+TOKEN_VERSION=0
 
-2) Backend
-- Install deps and create .env
-  ```powershell
-  cd ./Backend
-  npm install
-  ```
-- Create `./Backend/.env` — minimal example:
-  ```env
-  DB_HOST=localhost
-  DB_USER=root
-  DB_PASSWORD=your_db_password
-  DB_NAME=bamx
+# Database
+DB_HOST=localhost        # 'mysql' when using docker-compose
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_db_password
+DB_NAME=bamx
 
-  JWT_SECRET=change_this
-  FRONTEND_URL=http://localhost:5173
+# Frontend URL (used to build links in emails)
+FRONTEND_URL=http://localhost:5173
 
-  # Optional: configure CORS allowed origins
-  CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3001
+# CORS (comma separated). Use exact origins used by browsers, avoid '*' in production
+CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3001
 
-  # Mail (optional)
-  EMAIL_USER=you@example.com
-  CLIENT_ID=...
-  CLIENT_SECRET=...
-  REFRESH_TOKEN=...
-  ```
-- Start backend (dev):
-  ```powershell
-  npm run dev
-  ```
-  or production-like:
-  ```powershell
-  npm start
-  ```
-- Backend listens on port 3000 by default.
+# Email - choose one method below
 
-3) Frontend
-- Install deps and set env
-  ```powershell
-  cd ./Frontend/bamx
-  npm install
-  ```
-- Create `./Frontend/bamx/.env`:
-  ```env
-  VITE_API_URL=http://localhost:3000/api
-  VITE_API_PROXY=http://localhost:3000
-  ```
-- Start dev server:
-  ```powershell
-  npm run dev
-  ```
-  Open URL reported by Vite (usually http://localhost:5173).
+# Option A: SMTP username/password
+EMAIL_TRANSPORT=smtp              # optional flag used by code if present
+EMAIL_USER=you@example.com
+EMAIL_PASS=your_smtp_password
+EMAIL_HOST=smtp.gmail.com         # optional, defaults depend on code
+EMAIL_PORT=587
+EMAIL_SECURE=false                # true for 465
 
-Notes for no-docker setup
-- When running backend locally and frontend via Vite, VITE_API_PROXY ensures /api requests are proxied to backend in dev.
-- Ensure BACKEND CORS_ALLOWED_ORIGINS includes Vite origin (port 5173) so browser requests are allowed.
+# Option B: Gmail OAuth2 (preferred for Gmail automation)
+# If using OAuth2 the code uses CLIENT_ID/CLIENT_SECRET/REFRESH_TOKEN with EMAIL_USER
+CLIENT_ID=your_google_oauth_client_id
+CLIENT_SECRET=your_google_oauth_client_secret
+REFRESH_TOKEN=your_google_refresh_token
+EMAIL_USER=you@example.com        # same email address used for OAuth2
 
----------------------------------------------------------------------------------------------------
-RUNNING WITH DOCKER (recommended for parity)
----------------------------------------------------------------------------------------------------
-
-1) What the compose file does (defaults in repo)
-- mysql -> exposes host port 3308 mapped to container 3306
-- backend -> exposes 3000:3000
-- frontend -> builds static container and exposes 3001:3000
-- Compose passes environment variables (CORS_ALLOWED_ORIGINS and FRONTEND_URL) to backend and VITE_API_PROXY to frontend.
-
-2) Prepare envs
-- Backend: edit `./Backend/.env` for DB credentials used by container (DB_HOST should be `mysql` when running in compose) OR rely on docker-compose env override. Example:
-  ```env
-  DB_HOST=mysql
-  DB_USER=root
-  DB_PASSWORD=RedBAMX2025!
-  DB_NAME=bamx
-  FRONTEND_URL=http://localhost:3001
-  CORS_ALLOWED_ORIGINS=http://localhost:3001,http://localhost:5173
-  ```
-- Frontend: `./Frontend/bamx/.env` can remain as VITE_API_URL=http://backend:3000/api or use compose overrides.
-
-3) Start with compose (Windows PowerShell)
-  ```powershell
-  cd .
-  docker-compose down
-  docker-compose build --no-cache
-  docker-compose up
-  ```
-- Access frontend static container at http://localhost:3001
-- Backend API at http://localhost:3000
-- MySQL exposed at host port 3308 (use for local tools).
-
-4) Notes for Docker
-- If you change env vars in docker-compose.yml or Backend/.env, rebuild/recreate containers:
-  ```powershell
-  docker-compose up --build
-  ```
-- The compose includes a MySQL healthcheck; backend may still require a readiness wait script if your backend connects immediately on start. If you need robust start ordering, add a small wait-for script and entrypoints (see project suggestions earlier).
-
----------------------------------------------------------------------------------------------------
-SEEDING FIRST ADMIN
----------------------------------------------------------------------------------------------------
-- The repo includes ./db_init/init.sql to create schema and seed an initial admin. If you need to create or reset:
-  - In Docker, the SQL files in ./db_init are executed automatically by the image at first startup.
-  - Locally, import `./db_init/init.sql` into MySQL as shown above.
-
-If you want to add an admin manually:
-```sql
--- Example (one-time)
-INSERT INTO users (email, password, username, role, is_confirmed, created_at)
-VALUES ('admin@example.org', '<bcrypt-hash>', 'Initial Admin', 'ADMIN', 1, NOW());
-```
-- Use bcrypt to hash passwords (do not store plain text). Prefer invite/accept flow for adding admins.
-
----------------------------------------------------------------------------------------------------
-COMMON TROUBLESHOOTING
----------------------------------------------------------------------------------------------------
-- Backend CORS errors:
-  - Make sure BACKEND env `CORS_ALLOWED_ORIGINS` contains the exact protocol+host+port you open in browser (e.g. http://localhost:5173).
-  - After editing .env, restart backend.
-
-- Frontend dev proxy not working:
-  - Vite reads VITE_API_PROXY on startup. Restart `npm run dev` after changing `.env`.
-
-- MySQL connection refused:
-  - When using Docker, use DB_HOST=mysql inside backend container.
-  - If running locally, ensure MySQL is listening on the expected port and your .env points to correct host/port.
-
-- Invite/Email not sent:
-  - Confirm EMAIL_* env vars are set and OAuth2 credentials valid.
-  - Check backend logs for nodemailer errors.
-
-- Rate limiting:
-  - The backend includes request rate limits (global and specific endpoints). If you are blocked, wait the configured window (e.g., 15 min for login limiter) or adjust limits in `./Backend/server.js` / route-level middlewares.
-
----------------------------------------------------------------------------------------------------
-USEFUL COMMANDS
----------------------------------------------------------------------------------------------------
-Local development
-```powershell
-# Backend
-cd ./Backend
-npm install
-npm run dev
-
-# Frontend
-cd ./Frontend/bamx
-npm install
-npm run dev
+# Invite / account management
+UNCONFIRMED_DELETE_DAYS=30
+TEST_CLEANUP=false
+TEST_CLEANUP_INTERVAL_MS=60000
 ```
 
-Docker
-```powershell
-cd .
-docker-compose up --build
-docker-compose down
-docker-compose logs -f backend
+Notes:
+- The backend supports both basic SMTP (EMAIL_PASS) and OAuth2 (CLIENT_ID/CLIENT_SECRET/REFRESH_TOKEN). Provide either set accordingly.
+- FRONTEND_URL must match the public URL users will open (used in confirmation/invite email links).
+- CORS_ALLOWED_ORIGINS must include the Vite dev host (usually `http://localhost:5173`) and any static frontend container host/port.
+
+---
+
+### Frontend (`./Frontend/bamx/.env`)
+
+```env
+# Runtime / build
+VITE_API_URL=http://localhost:3000/api    # API base used by client at runtime (includes /api)
+# Dev server proxy used by Vite (so /api requests are proxied to backend)
+VITE_API_PROXY=http://localhost:3000
 ```
 
-Database
+- VITE_API_PROXY is used by `vite.config.ts` during `npm run dev`.
+- VITE_API_URL is used by the app at runtime (build or dev).
+
+---
+
+## Seeding the first admin user
+
+The repo includes `./db_init/init.sql` which creates schema and inserts one admin user automatically when MySQL container initializes (docker mode). If you run locally or need to seed manually, follow one of these:
+
+1) Use provided init SQL (docker)
+- When running MySQL container with `./db_init` mounted, `init.sql` runs automatically on first start.
+
+2) Manual import (local MySQL)
 ```powershell
-# import schema locally (run from project root)
+# from project root
 mysql -u root -p -P 3306 bamx < ./db_init/init.sql
 ```
 
----------------------------------------------------------------------------------------------------
-SECURITY & PRODUCTION NOTES
----------------------------------------------------------------------------------------------------
-- Never commit `.env` files or secrets.
-- In production:
-  - Use exact CORS origins (avoid '*').
-  - Use a secrets manager for DB and email credentials.
-  - Use HTTPS and strong JWT secrets.
-  - Use persistent stores (Redis) for rate-limiter if multiple instances.
-  - Consider using Kubernetes or a managed service for scaling.
-
----------------------------------------------------------------------------------------------------
-NEXT STEPS / SUGGESTIONS
----------------------------------------------------------------------------------------------------
-- Add a small wait-for script and entrypoints for containers to wait for DB/backend readiness (recommended for reliability).
-- Consider adding example Kubernetes manifests for prod deployment.
-- Add documentation for emergency admin account creation (CLI script).
-
-If you want, I can:
-- Add the wait-for script and Dockerfile entrypoint patches now.
-- Add a short checklist for deploying to a cloud provider.
-```// filepath: c:\Users\Diego\Documents\Banco De Alimentos\Aplicacion\README.md
-# Banco de Alimentos — Aplicación
-
-Fullstack app: Frontend (Vite + React + Tailwind), Backend (Node + Express), DB (MySQL).
-
-This README describes two ways to run the app locally:
-- Without Docker (install services locally)
-- With Docker Compose (recommended for parity)
-
-General notes
-- Project root: . (this repository root)
-- Frontend folder: ./Frontend/bamx
-- Backend folder: ./Backend
-- Default ports in examples:
-  - Backend API: http://localhost:3000 (container: backend:3000)
-  - Frontend (static container): http://localhost:3001 (Vite dev usually at http://localhost:5173)
-  - MySQL (host mapped in compose): 3308 -> container 3306
-
-Important env keys (examples — never commit secrets)
-- Backend/.env
-  - DB_HOST=mysql (when running in Docker) or localhost (local run)
-  - DB_USER=root
-  - DB_PASSWORD=...
-  - DB_NAME=bamx
-  - JWT_SECRET=...
-  - FRONTEND_URL=http://localhost:5173 (URL used in emails)
-  - CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3001
-  - EMAIL_USER, CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN (for nodemailer OAuth2)
-- Frontend/bamx/.env
-  - VITE_API_URL=http://localhost:3000/api  (used at runtime)
-  - VITE_API_PROXY=http://localhost:3000     (Vite dev server proxy)
-
----------------------------------------------------------------------------------------------------
-RUNNING WITHOUT DOCKER (development)
----------------------------------------------------------------------------------------------------
-
-1) Prepare DB
-- Install MySQL 8 locally and start it.
-- Create the database and import schema/seed (project ships ./db_init/init.sql).
-  Example (from project root):
-  ```powershell
-  mysql -u root -p -P 3306 bamx < ./db_init/init.sql
-  ```
-  Adjust port if your MySQL uses a different port.
-
-2) Backend
-- Install deps and create .env
-  ```powershell
-  cd ./Backend
-  npm install
-  ```
-- Create `./Backend/.env` — minimal example:
-  ```env
-  DB_HOST=localhost
-  DB_USER=root
-  DB_PASSWORD=your_db_password
-  DB_NAME=bamx
-
-  JWT_SECRET=change_this
-  FRONTEND_URL=http://localhost:5173
-
-  # Optional: configure CORS allowed origins
-  CORS_ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3001
-
-  # Mail (optional)
-  EMAIL_USER=you@example.com
-  CLIENT_ID=...
-  CLIENT_SECRET=...
-  REFRESH_TOKEN=...
-  ```
-- Start backend (dev):
-  ```powershell
-  npm run dev
-  ```
-  or production-like:
-  ```powershell
-  npm start
-  ```
-- Backend listens on port 3000 by default.
-
-3) Frontend
-- Install deps and set env
-  ```powershell
-  cd ./Frontend/bamx
-  npm install
-  ```
-- Create `./Frontend/bamx/.env`:
-  ```env
-  VITE_API_URL=http://localhost:3000/api
-  VITE_API_PROXY=http://localhost:3000
-  ```
-- Start dev server:
-  ```powershell
-  npm run dev
-  ```
-  Open URL reported by Vite (usually http://localhost:5173).
-
-Notes for no-docker setup
-- When running backend locally and frontend via Vite, VITE_API_PROXY ensures /api requests are proxied to backend in dev.
-- Ensure BACKEND CORS_ALLOWED_ORIGINS includes Vite origin (port 5173) so browser requests are allowed.
-
----------------------------------------------------------------------------------------------------
-RUNNING WITH DOCKER (recommended for parity)
----------------------------------------------------------------------------------------------------
-
-1) What the compose file does (defaults in repo)
-- mysql -> exposes host port 3308 mapped to container 3306
-- backend -> exposes 3000:3000
-- frontend -> builds static container and exposes 3001:3000
-- Compose passes environment variables (CORS_ALLOWED_ORIGINS and FRONTEND_URL) to backend and VITE_API_PROXY to frontend.
-
-2) Prepare envs
-- Backend: edit `./Backend/.env` for DB credentials used by container (DB_HOST should be `mysql` when running in compose) OR rely on docker-compose env override. Example:
-  ```env
-  DB_HOST=mysql
-  DB_USER=root
-  DB_PASSWORD=RedBAMX2025!
-  DB_NAME=bamx
-  FRONTEND_URL=http://localhost:3001
-  CORS_ALLOWED_ORIGINS=http://localhost:3001,http://localhost:5173
-  ```
-- Frontend: `./Frontend/bamx/.env` can remain as VITE_API_URL=http://backend:3000/api or use compose overrides.
-
-3) Start with compose (Windows PowerShell)
-  ```powershell
-  cd .
-  docker-compose down
-  docker-compose build --no-cache
-  docker-compose up
-  ```
-- Access frontend static container at http://localhost:3001
-- Backend API at http://localhost:3000
-- MySQL exposed at host port 3308 (use for local tools).
-
-4) Notes for Docker
-- If you change env vars in docker-compose.yml or Backend/.env, rebuild/recreate containers:
-  ```powershell
-  docker-compose up --build
-  ```
-- The compose includes a MySQL healthcheck; backend may still require a readiness wait script if your backend connects immediately on start. If you need robust start ordering, add a small wait-for script and entrypoints (see project suggestions earlier).
-
----------------------------------------------------------------------------------------------------
-SEEDING FIRST ADMIN
----------------------------------------------------------------------------------------------------
-- The repo includes ./db_init/init.sql to create schema and seed an initial admin. If you need to create or reset:
-  - In Docker, the SQL files in ./db_init are executed automatically by the image at first startup.
-  - Locally, import `./db_init/init.sql` into MySQL as shown above.
-
-If you want to add an admin manually:
+3) Create admin manually (one-time)
+- Generate a bcrypt hash (example using Node + bcryptjs):
+```bash
+node -e "console.log(require('bcryptjs').hashSync('YourSecurePassword!', 12))"
+# copy printed hash into SQL below
+```
+- Insert the admin:
 ```sql
--- Example (one-time)
 INSERT INTO users (email, password, username, role, is_confirmed, created_at)
 VALUES ('admin@example.org', '<bcrypt-hash>', 'Initial Admin', 'ADMIN', 1, NOW());
 ```
-- Use bcrypt to hash passwords (do not store plain text). Prefer invite/accept flow for adding admins.
 
----------------------------------------------------------------------------------------------------
-COMMON TROUBLESHOOTING
----------------------------------------------------------------------------------------------------
-- Backend CORS errors:
-  - Make sure BACKEND env `CORS_ALLOWED_ORIGINS` contains the exact protocol+host+port you open in browser (e.g. http://localhost:5173).
-  - After editing .env, restart backend.
+Security note: Keep the seeded admin credentials secure and rotate/reset after first login. Prefer using the invite flow for adding additional admin accounts.
 
-- Frontend dev proxy not working:
-  - Vite reads VITE_API_PROXY on startup. Restart `npm run dev` after changing `.env`.
+---
 
-- MySQL connection refused:
-  - When using Docker, use DB_HOST=mysql inside backend container.
-  - If running locally, ensure MySQL is listening on the expected port and your .env points to correct host/port.
+## Quick run (local, no Docker)
 
-- Invite/Email not sent:
-  - Confirm EMAIL_* env vars are set and OAuth2 credentials valid.
-  - Check backend logs for nodemailer errors.
-
-- Rate limiting:
-  - The backend includes request rate limits (global and specific endpoints). If you are blocked, wait the configured window (e.g., 15 min for login limiter) or adjust limits in `./Backend/server.js` / route-level middlewares.
-
----------------------------------------------------------------------------------------------------
-USEFUL COMMANDS
----------------------------------------------------------------------------------------------------
-Local development
+1. Start MySQL (local) and import schema:
 ```powershell
-# Backend
-cd ./Backend
-npm install
-npm run dev
-
-# Frontend
-cd ./Frontend/bamx
-npm install
-npm run dev
-```
-
-Docker
-```powershell
-cd .
-docker-compose up --build
-docker-compose down
-docker-compose logs -f backend
-```
-
-Database
-```powershell
-# import schema locally (run from project root)
 mysql -u root -p -P 3306 bamx < ./db_init/init.sql
 ```
 
----------------------------------------------------------------------------------------------------
-SECURITY & PRODUCTION NOTES
----------------------------------------------------------------------------------------------------
+2. Backend
+```powershell
+cd ./Backend
+npm install
+# create ./Backend/.env as documented above
+npm run dev
+```
+
+3. Frontend
+```powershell
+cd ./Frontend/bamx
+npm install
+# create ./Frontend/bamx/.env as documented above
+npm run dev
+```
+
+Open the Vite URL (usually `http://localhost:5173`).
+
+---
+
+## Quick run with Docker Compose
+
+1. Edit compose env overrides in `docker-compose.yml` if needed (CORS_ALLOWED_ORIGINS, FRONTEND_URL).
+2. From project root:
+```powershell
+docker-compose down
+docker-compose build --no-cache
+docker-compose up
+```
+- Frontend static container default: `http://localhost:3001`
+- Backend API: `http://localhost:3000`
+- MySQL host mapped to `3308` (container `3306`) per compose.
+
+---
+
+## Email troubleshooting
+
+- If emails do not send:
+  - Confirm correct EMAIL_* env values.
+  - For Gmail OAuth2: ensure CLIENT_ID/CLIENT_SECRET and REFRESH_TOKEN are valid and the Google account permits sending.
+  - Check backend logs for nodemailer errors.
+- For SMTP with Gmail and username/password, Google often blocks less-secure logins; prefer OAuth2.
+
+---
+
+## Security & production recommendations
+
 - Never commit `.env` files or secrets.
-- In production:
-  - Use exact CORS origins (avoid '*').
-  - Use a secrets manager for DB and email credentials.
-  - Use HTTPS and strong JWT secrets.
-  - Use persistent stores (Redis) for rate-limiter if multiple instances.
-  - Consider using Kubernetes or a managed service for scaling.
+- Use exact CORS origins (avoid `*` in production).
+- Use HTTPS and strong JWT secrets.
+- Use a persistent store (Redis) for rate-limiters in multi-instance deployments.
+- Use a secrets manager for production credentials.
+
+---
