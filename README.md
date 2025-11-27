@@ -188,9 +188,3 @@ Notes:
 - Use a secrets manager for production credentials.
 - Use Redis or another shared store for rate-limiters in multi-instance deployments.
 - Prefer invite-based admin onboarding; keep manual DB seed as an emergency bootstrap method.
-
----
-
-If you want, I can:
-- Add a short checklist to generate and persist OAuth2 refresh tokens for EMAIL_USER.
-- Provide a small script to validate env at backend startup (checks required vars).
