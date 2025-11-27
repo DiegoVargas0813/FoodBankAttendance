@@ -76,7 +76,7 @@ CREATE TABLE invites (
   FOREIGN KEY (invited_by) REFERENCES users(idusers) ON DELETE SET NULL
 );
 
-INSERT INTO users (email, password, username, role)
-values ('A01635782@tec.mx', '$2a$12$ix3oROFt.RQHrQCqVIRUr.KlepovKbr7Tm4rZUwq9HaEub50kCgyi', 'Diego Vargas', 'ADMIN');
+INSERT INTO users (email, password, username, role, is_confirmed)
+values ('A01635782@tec.mx', '$2a$12$ix3oROFt.RQHrQCqVIRUr.KlepovKbr7Tm4rZUwq9HaEub50kCgyi', 'Diego Vargas', 'ADMIN', 1);
 
 SELECT * FROM users;
