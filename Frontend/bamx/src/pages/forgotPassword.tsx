@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardHeader,
@@ -13,7 +12,6 @@ import { Button } from '../components/ui/button';
 const apiUrl = import.meta.env.VITE_API_URL || '';
 
 export default function ForgotPassword() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
@@ -26,6 +24,7 @@ export default function ForgotPassword() {
     if (!email) return setError('Correo requerido.');
     setLoading(true);
     try {
+      // @ts-ignore
       const res = await fetch(`${apiUrl}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
