@@ -1,4 +1,3 @@
-// ...existing code...
 const db = require('../connection');
 
 exports.insertFile = (idusers, filePath, fileType) => {
@@ -31,8 +30,6 @@ exports.getByUser = (idusers) => {
     });
   });
 };
-
-// ...existing code...
 
 // NEW: find single file for user and type (e.g. ID_PHOTO or ADDRESS_PHOTO)
 exports.getByUserAndType = (idusers, fileType) => {

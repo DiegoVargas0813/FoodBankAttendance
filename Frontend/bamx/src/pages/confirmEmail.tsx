@@ -1,4 +1,3 @@
-// ...existing code...
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../components/layout/layout";
@@ -140,4 +139,3 @@ const ConfirmEmail = () => {
 };
 
 export default ConfirmEmail;
-// ...existing code...

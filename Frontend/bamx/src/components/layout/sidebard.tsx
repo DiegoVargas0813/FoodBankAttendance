@@ -1,4 +1,3 @@
-// ...existing code...
 import { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { cn } from '../../utils/cn';
@@ -118,4 +117,3 @@ const Sidebar = () => {
 };
 
 export default Sidebar;
-// ...existing code...

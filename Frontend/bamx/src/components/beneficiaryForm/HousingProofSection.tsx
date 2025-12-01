@@ -1,4 +1,3 @@
-// ...existing code...
 import React, { useRef, useState } from 'react';
 
 type FileRecord = { idfiles: number; file_path: string; file_type: string };

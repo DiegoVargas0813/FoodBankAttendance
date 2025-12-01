@@ -1,4 +1,3 @@
-// ...existing code...
 import { useEffect, useState, useCallback } from 'react';
 import Layout from '../components/layout/layout';
 import { useAuth } from '../context/AuthContext';

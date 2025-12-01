@@ -1,4 +1,3 @@
-// ...existing code...
 const path = require('path');
 const fs = require('fs');
 const mediaModel = require('../models/mediaModel');

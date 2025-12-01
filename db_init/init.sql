@@ -81,6 +81,6 @@ CREATE TABLE invites (
 CREATE INDEX idx_users_password_reset_token ON users (password_reset_token);
 
 INSERT INTO users (email, password, username, role, is_confirmed)
-values ('A01635782@tec.mx', '$2a$12$ix3oROFt.RQHrQCqVIRUr.KlepovKbr7Tm4rZUwq9HaEub50kCgyi', 'Diego Vargas', 'ADMIN', 1);
+values ('registroapp@bdalimentos.org', '$2b$12$3zKSsoESqiNDY90BJy4qo.MA1u12dnoj2Yy50U6budE6jMlujHckW', 'Main Admin', 'ADMIN', 1);
 
 SELECT * FROM users;

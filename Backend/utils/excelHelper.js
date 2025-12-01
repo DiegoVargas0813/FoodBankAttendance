@@ -1,4 +1,3 @@
-// ...existing code...
 const ExcelJS = require('exceljs');
 const { formSections, mapValue, assetsLabels, nutritionQuestions, economicIncomeLabels, economicExpenseLabels } = require('./formMapping');
 
@@ -334,4 +333,3 @@ function buildWorkbookFromFamily(family) {
 }
 
 module.exports = { buildWorkbookFromFamily };
-// ...existing code...

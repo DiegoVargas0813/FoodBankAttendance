@@ -14,7 +14,7 @@ All backend envs -> `./Backend/.env`
 All frontend envs -> `./Frontend/bamx/.env`
 
 Notes:
-- The application uses OAuth2 (recommended) for sending confirmation/invite emails. Do not configure SMTP in this README.
+- The application uses OAuth2 (recommended) for sending confirmation/invite emails.
 - FRONTEND_URL is used to build links sent by email.
 - CORS_ALLOWED_ORIGINS must include any browser-origin (Vite/PWA/static host) that will call the API.
 

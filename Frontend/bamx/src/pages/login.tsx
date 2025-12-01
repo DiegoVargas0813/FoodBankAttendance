@@ -12,8 +12,6 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { useAuth } from '../context/AuthContext';
 
-// ...existing code...
-
 const Login = () => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');

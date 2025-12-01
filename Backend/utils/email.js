@@ -11,7 +11,6 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// ...existing code...
 exports.sendConfirmationEmail = (to, token) => {
     const confirmUrl = `${process.env.FRONTEND_URL}/confirm/${encodeURIComponent(token)}`;
 
@@ -94,8 +93,6 @@ exports.sendConfirmationEmail = (to, token) => {
     return transporter.sendMail(mailOptions);
 };
 
-// ...existing code...
-// add this export after existing functions
 
 exports.sendInviteEmail = async (to, token, role = 'ADMIN') => {
   const acceptUrl = `${process.env.FRONTEND_URL}/accept-invite?token=${encodeURIComponent(token)}`;
@@ -151,7 +148,6 @@ exports.sendInviteEmail = async (to, token, role = 'ADMIN') => {
 };
 
 // Reset email function (used in passwordController)
-// ...existing code...
 exports.sendResetEmail = async (to, token) => {
   const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${encodeURIComponent(token)}`;
   const primaryHex = '#00943B';

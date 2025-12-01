@@ -1,4 +1,3 @@
-// ...existing code...
 import { useState, useEffect } from 'react';
 
 import CollapsibleSection from './CollapsibleSection';
@@ -237,4 +236,3 @@ const FamilyMembersSection = ({members = [], onChange, onNext, onPrev}: Props) =
 }
 
 export default FamilyMembersSection;
-// ...existing code...

@@ -5,7 +5,6 @@ const authMiddleware = require('../utils/authMiddleware');
 const roleMiddleware = require('../utils/roleMiddleware');
 const rateLimit = require('express-rate-limit');
 
-// ...existing code...
 
 // Rate limiters
 const adminWriteLimiter = rateLimit({

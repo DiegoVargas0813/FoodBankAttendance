@@ -1,4 +1,3 @@
-// ...existing code...
 import React from 'react';
 
 type Props = {
@@ -26,4 +25,3 @@ const CollapsibleSection = ({title, collapsed, onToggle, children}: Props) => (
 )
 
 export default CollapsibleSection;
-// ...existing code...
